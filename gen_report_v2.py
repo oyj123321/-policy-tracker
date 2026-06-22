@@ -1,0 +1,643 @@
+# 政策周报 模板 v2 — 2026年6月22日
+# 升级：变动标记、市场映射、下周关注、深度拆解、来源分级
+
+import os
+
+html = r"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>政策周报 — 2026年06月22日</title>
+<style>
+  :root { --blue:#1d4ed8; --light:#eff6ff; --gray:#f3f4f6; --border:#d1d5db; --text:#1e293b; --muted:#64748b; --green:#059669; --red:#dc2626; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    max-width:1080px; margin:0 auto; padding:48px 28px 80px;
+    font-family:-apple-system,BlinkMacSystemFont,'Microsoft YaHei','PingFang SC',sans-serif;
+    font-size:15px; line-height:1.75; color:var(--text); background:#f8fafc;
+  }
+
+  .cover {
+    background:linear-gradient(135deg,#1e3a8a 0%,#2563eb 100%);
+    color:#fff; padding:48px 40px; border-radius:12px; margin-bottom:40px;
+  }
+  .cover h1 { font-size:30px; margin-bottom:8px; letter-spacing:1px; }
+  .cover .meta { font-size:14px; opacity:0.85; margin-top:4px; }
+  .cover .meta span { margin-right:24px; }
+
+  .section-title {
+    font-size:22px; font-weight:700; color:#1e3a8a;
+    margin:44px 0 8px; padding-bottom:8px;
+    border-bottom:3px solid #2563eb;
+  }
+  .subsection-title {
+    font-size:17px; font-weight:700; color:#1d4ed8;
+    margin:28px 0 10px; padding-left:12px;
+    border-left:4px solid #2563eb;
+  }
+
+  .table-wrap { overflow-x:auto; margin:12px 0 28px; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,.08); }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; background:#fff; }
+  thead th {
+    background:#1e3a8a; color:#fff; padding:10px 8px; text-align:left;
+    font-weight:600; font-size:12.5px; white-space:nowrap;
+  }
+  tbody td { padding:9px 8px; border-bottom:1px solid #e2e8f0; vertical-align:top; }
+  tbody tr:nth-child(even) { background:#f8fafc; }
+  tbody tr:hover { background:#dbeafe; }
+
+  .tag-new { display:inline-block; background:#d1fae5; color:#065f46; padding:1px 7px; border-radius:3px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .tag-renew { display:inline-block; background:#dbeafe; color:#1e40af; padding:1px 7px; border-radius:3px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .tag-warn { display:inline-block; background:#fee2e2; color:#991b1b; padding:1px 7px; border-radius:3px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .arrow-up { color:#059669; font-weight:700; }
+  .arrow-down { color:#dc2626; font-weight:700; }
+  .arrow-flat { color:#6b7280; }
+
+  .mkt-row { font-size:12px; color:var(--muted); background:#fffbeb !important; }
+  .mkt-row td { padding:5px 8px; font-style:italic; }
+
+  .insight { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:24px 28px; margin:20px 0; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .insight h3 { font-size:16px; color:#1e3a8a; margin-bottom:10px; }
+  .insight p { margin:8px 0; color:#334155; }
+  .insight .q { font-weight:700; color:#0f172a; }
+  .insight .counter { background:#fef2f2; border-left:4px solid #dc2626; padding:8px 12px; margin:12px 0; font-size:14px; color:#991b1b; border-radius:4px; }
+  .insight .ref { background:#f0f9ff; border-left:4px solid #0ea5e9; padding:8px 12px; margin:12px 0; font-size:14px; color:#0c4a6e; border-radius:4px; }
+
+  .dirs { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:16px; margin:12px 0 24px; }
+  .dir-card { background:#fff; border-left:4px solid #2563eb; border-radius:6px; padding:16px 20px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .dir-card .num { font-size:22px; font-weight:800; color:#2563eb; }
+  .dir-card h4 { font-size:15px; margin:4px 0 6px; color:#0f172a; }
+  .dir-card p { font-size:13px; color:#475569; line-height:1.6; }
+
+  /* ── 下周关注 ── */
+  .next-week { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; margin:12px 0 24px; }
+  .nw-card { background:#fff; border-radius:8px; padding:14px 18px; box-shadow:0 1px 3px rgba(0,0,0,.06); border-top:3px solid #2563eb; }
+  .nw-card.hot { border-top-color:#dc2626; }
+  .nw-card .date { font-size:12px; color:var(--muted); }
+  .nw-card h4 { font-size:14px; margin:4px 0; color:#0f172a; }
+  .nw-card p { font-size:12px; color:#475569; }
+
+  /* ── 来源分级 ── */
+  .sources { font-size:12px; color:var(--muted); margin-top:48px; padding-top:20px; border-top:1px solid var(--border); }
+  .sources .tier { margin:6px 0; }
+  .sources .tier-label { font-weight:700; margin-right:6px; }
+  .sources .t1 { color:#065f46; }
+  .sources .t2 { color:#1d4ed8; }
+  .sources .t3 { color:#6b7280; }
+
+  @media print { body { font-size:12px; padding:20px; } table { font-size:11px; } }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>📋 政策周报</h1>
+  <div class="meta"><span>📅 2026年06月22日</span><span>📆 覆盖：6月15日 – 6月21日</span><span>🔜 下期：6月29日</span></div>
+</div>
+
+<!-- ═══════════════ 中国 ═══════════════ -->
+<div class="section-title">🇨🇳 中国产业政策</div>
+
+<!-- ── 新能源/电动车 ── -->
+<div class="subsection-title">🔋 新能源 / 电动车</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:200px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:120px">金额/规模</th><th style="min-width:210px">要点</th><th style="min-width:130px">市场映射</th></tr></thead>
+<tbody>
+<tr>
+  <td>五部门启动 2026 年新能源汽车下乡</td>
+  <td><span class="tag-renew">续期加码</span></td>
+  <td class="arrow-up">↑ 加力</td>
+  <td>累计销量已破 2000 万辆</td>
+  <td>落实车购税/车船税减免、县域充换电设施补短板；覆盖千县万镇</td>
+  <td>锂电/充电桩/县域轻客</td>
+</tr>
+<tr>
+  <td>工信部等三部门新能源车企座谈会</td>
+  <td><span class="tag-new">新政</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>—</td>
+  <td>补齐<strong>汽车芯片及基础软件</strong>短板；新能源重卡规模化；60 天账期；规范竞争</td>
+  <td>车规芯片/重卡/IGBT</td>
+</tr>
+<tr class="mkt-row"><td colspan="6">📈 本周映射：比亚迪 +3.2%、宁德时代 +1.8%、斯达半导 +6.1%（车芯补短板催化）；重卡板块中国重汽 +4.5%</td></tr>
+<tr>
+  <td>工信部《2026 年汽车标准化工作要点》</td>
+  <td><span class="tag-new">新政</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>—</td>
+  <td>四大方向：质量安全、绿色低碳、车路云一体化、<strong>固态电池标准体系</strong>预研</td>
+  <td>固态电池/车路云/车载AI</td>
+</tr>
+<tr>
+  <td>国家能源局：可再生能源消费考核扩围</td>
+  <td><span class="tag-new">新政</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>—</td>
+  <td>算力设施、多晶硅、锂离子电池制造纳入考核—"以绿造绿"</td>
+  <td>绿电/多晶硅/储能</td>
+</tr>
+<tr>
+  <td>新能源车购置税减半</td>
+  <td><span class="tag-renew">退坡续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>全免 → <strong>减半</strong></td>
+  <td>购车成本+数千元；15+ 车企已提价或减优惠；行业利润率 1-4 月仅 3.4%</td>
+  <td>整车/经销商承压</td>
+</tr>
+</tbody></table></div>
+
+<!-- ── 半导体/科技 ── -->
+<div class="subsection-title">💾 半导体 / 科技</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:200px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:120px">金额/规模</th><th style="min-width:210px">要点</th><th style="min-width:130px">市场映射</th></tr></thead>
+<tbody>
+<tr>
+  <td>汽车芯片国产替代提速</td>
+  <td><span class="tag-new">新政加码</span></td>
+  <td class="arrow-up">↑ 加力</td>
+  <td>—</td>
+  <td>工信部明确扩大国产汽车芯片应用规模；北京此前已要求车企最大化使用国产芯片</td>
+  <td>车规MCU/SiC/IGBT</td>
+</tr>
+<tr>
+  <td>芯联集成 12 英寸车规晶圆厂</td>
+  <td><span class="tag-new">重大投资</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td><strong>200 亿元</strong>（~$30亿）</td>
+  <td>浙江绍兴；月产 5 万片；覆盖新能源车、AI 服务器、机器人芯片</td>
+  <td>晶圆代工/设备/材料</td>
+</tr>
+<tr>
+  <td>七部门：平台经济协同发展行动方案</td>
+  <td><span class="tag-new">新政</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>—</td>
+  <td>培育制造业单项冠军；平台企业向产业互联网转型；2026-2028</td>
+  <td>工业互联网/平台企业</td>
+</tr>
+<tr class="mkt-row"><td colspan="6">📈 本周映射：6/16 半导体板块多股涨停（斯达半导+6.1%、芯原股份+5.8%）；科创50 周涨 2.3%</td></tr>
+<tr>
+  <td>研发费用加计扣除</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>—</td>
+  <td>科技企业研发费用 <strong>100% 加计扣除</strong>；半导体/软件/AI 核心受益</td>
+  <td>科技全板块</td>
+</tr>
+</tbody></table></div>
+
+<!-- ── 房地产/基建/城市更新 ── -->
+<div class="subsection-title">🏗️ 房地产 / 基建 / 城市更新</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:200px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:120px">金额/规模</th><th style="min-width:210px">要点</th><th style="min-width:130px">市场映射</th></tr></thead>
+<tbody>
+<tr>
+  <td>财政部：十五五中央财政支持城市更新</td>
+  <td><span class="tag-new">新政定调</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>2026年中央预算 <strong>970 亿元</strong></td>
+  <td>保障房、城中村改造、老旧小区改造、地下管网；惠及约 800 万户</td>
+  <td>建筑/建材/管材/电梯</td>
+</tr>
+<tr>
+  <td>新增专项债发行进度</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-down">↓ 偏慢</td>
+  <td>累计 ~1.67 万亿 / 全年 4.4 万亿</td>
+  <td>截至6月下旬进度 <strong>约 42%</strong>，慢于近5年同期均值 50%；6月望提速</td>
+  <td>基建/城投债/水泥</td>
+</tr>
+<tr>
+  <td>超长期特别国债支持地下管网/老旧小区</td>
+  <td><span class="tag-new">新渠道</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>未披露</td>
+  <td>新增资金渠道；地下管网+老旧小区；替代部分土地出让金缺口</td>
+  <td>管材/防水/涂料</td>
+</tr>
+<tr class="mkt-row"><td colspan="6">📈 本周映射：海螺水泥 +1.5%、东方雨虹 +2.1%、中国建筑 +0.8%；专项债进度偏慢压制了板块进一步上行</td></tr>
+</tbody></table></div>
+
+<!-- ── 消费/以旧换新 ── -->
+<div class="subsection-title">🛒 消费 / 以旧换新</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:200px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:120px">金额/规模</th><th style="min-width:210px">要点</th><th style="min-width:130px">市场映射</th></tr></thead>
+<tbody>
+<tr>
+  <td>2026年消费品以旧换新总盘子</td>
+  <td><span class="tag-renew">续期减量</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>超长期国债 <strong>~2500 亿</strong>（较上年↓16.7%）</td>
+  <td>6月底前下达 2000 亿设备更新清单 + 第三批 625 亿消费品资金</td>
+  <td>家电/汽车/数码</td>
+</tr>
+<tr>
+  <td>汽车报废更新</td>
+  <td><span class="tag-renew">优化</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>最高 <strong>2 万/辆</strong>（改按车价比例）</td>
+  <td>置换更新最高 1.5 万；30 个工作日内兑付；补贴门槛提高</td>
+  <td>整车（以价换量）</td>
+</tr>
+<tr>
+  <td>家电以旧换新</td>
+  <td><span class="tag-renew">收紧</span></td>
+  <td class="arrow-down">↓ 收窄</td>
+  <td><strong>15%</strong> / 单件 ≤1500 元</td>
+  <td>仅补贴 <strong>1级能效</strong>（6类）；拉动系数 0.9→0.6</td>
+  <td>白电龙头/回收</td>
+</tr>
+<tr>
+  <td>数码及智能产品购新补贴</td>
+  <td><span class="tag-new">新增</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td><strong>15%</strong> / 单件 ≤500 元</td>
+  <td>手机/平板/手表/<strong>智能眼镜</strong>（4类）；单价≤6000元</td>
+  <td>消费电子/智能穿戴</td>
+</tr>
+<tr class="mkt-row"><td colspan="6">📈 本周映射：美的 +0.6%、海尔 +1.1%、小米 +2.4%（智能眼镜受益）；但 1-5月社零 -0.6% 压制消费板块情绪</td></tr>
+</tbody></table></div>
+
+<!-- ── 农业 ── -->
+<div class="subsection-title">🌾 农业 / 粮食</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:200px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:120px">金额/规模</th><th style="min-width:210px">要点</th><th style="min-width:130px">市场映射</th></tr></thead>
+<tbody>
+<tr>
+  <td>2026 中央一号文件：粮食最低收购价</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>小麦 1.19 · 粳稻 1.31 元/斤</td>
+  <td>连续 22 年兜底收购；粮食产销区省际横向补偿机制</td>
+  <td>种业/粮食加工</td>
+</tr>
+<tr>
+  <td>耕地地力保护补贴</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>全国 105–150 元/亩</td>
+  <td>6月底前发放；黑龙江 ≥75、江西 112 元/亩</td>
+  <td>—</td>
+</tr>
+<tr>
+  <td>玉米/大豆生产者补贴</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td>玉米≈120 · 大豆≈200 元/亩</td>
+  <td>吉林大豆高达 550 元/亩；鼓励大豆扩种</td>
+  <td>大豆/玉米种业</td>
+</tr>
+<tr>
+  <td>农机购置补贴</td>
+  <td><span class="tag-renew">续期</span></td>
+  <td class="arrow-flat">→ 持平</td>
+  <td><strong>30%–40%</strong>（重点机具 ≤50%）</td>
+  <td>覆盖全程机械化</td>
+  <td>农机/智能装备</td>
+</tr>
+</tbody></table></div>
+
+<!-- ═══════════════ 国际 ═══════════════ -->
+<div class="section-title">🌍 国际产业政策</div>
+
+<!-- ── 美国 CHIPS ── -->
+<div class="subsection-title">🇺🇸 美国 CHIPS / IRA / 半导体</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:180px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:130px">金额/规模</th><th style="min-width:180px">要点</th><th style="min-width:160px">对华溢出</th></tr></thead>
+<tbody>
+<tr>
+  <td>CHIPS Act 拨款基本完成</td>
+  <td>执行中</td>
+  <td class="arrow-up">↑ 加速</td>
+  <td>已拨付逾 <strong>360 亿美元</strong></td>
+  <td>Intel $78.6亿+$35亿国防；TSMC $66亿；三星 $47亿；美光 $61.7亿</td>
+  <td>受资助企业 <strong>10年内不得在华扩产</strong></td>
+</tr>
+<tr>
+  <td>35% 投资税收抵免 (ITC)</td>
+  <td><span class="tag-new">加码</span></td>
+  <td class="arrow-up">↑ 加码</td>
+  <td>25% → <strong>35%</strong></td>
+  <td>2026/12/31 前未破土动工则作废；可退税直接支付</td>
+  <td>全球产能加速向美集中</td>
+</tr>
+<tr>
+  <td>Intel 18A（1.8nm）量产</td>
+  <td>里程碑</td>
+  <td class="arrow-up">↑ 突破</td>
+  <td>—</td>
+  <td>亚利桑那 Fab 52 高量产；美国首次超越 2nm</td>
+  <td>先进逻辑从 0%(2022)→~15%(2025)</td>
+</tr>
+<tr>
+  <td>TSMC 亚利桑那良率 ≥92%</td>
+  <td>里程碑</td>
+  <td class="arrow-up">↑ 突破</td>
+  <td>$650 亿总投资</td>
+  <td>Fab1 满载；Fab2 在建(3nm/2nm, 2027)</td>
+  <td>最先进制程首次在美达台湾同级良率</td>
+</tr>
+<tr>
+  <td>三星德州 2nm GAA</td>
+  <td>在建</td>
+  <td class="arrow-flat">→ 推进</td>
+  <td>$370 亿+</td>
+  <td>锁定 Tesla/Google；2026 年底量产</td>
+  <td>先进制程供应链向北美集中</td>
+</tr>
+<tr>
+  <td>美国政府持有 Intel ~10%</td>
+  <td><span class="tag-new">新政</span></td>
+  <td class="arrow-up">↑ 新出</td>
+  <td>~$89 亿估值</td>
+  <td>股权置换拨款；正与 TSMC/三星/美光探讨类似</td>
+  <td>政府成半导体股东—史无前例</td>
+</tr>
+<tr>
+  <td><span class="tag-warn">⚠ 劳动力缺口</span></td>
+  <td>风险</td>
+  <td class="arrow-down">↓ 恶化</td>
+  <td>2030 年缺 ~7 万人</td>
+  <td>技术员/工程师严重不足；可能延缓爬坡</td>
+  <td>人才回流亚洲成可能选项</td>
+</tr>
+<tr class="mkt-row"><td colspan="6">📈 本周映射：费城半导体指数周涨 1.1%；台积电 ADR +0.8%；设备商应用材料 +2.3%（ITC 加码催化）</td></tr>
+</tbody></table></div>
+
+<!-- ── 欧盟 CBAM ── -->
+<div class="subsection-title">🇪🇺 欧盟 CBAM / 绿色工业</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:180px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:200px">要点</th><th style="min-width:160px">对华溢出</th></tr></thead>
+<tbody>
+<tr>
+  <td>CBAM 全面执行</td>
+  <td>2026/1/1起</td>
+  <td class="arrow-flat">→ 执行中</td>
+  <td>覆盖钢铁、铝、水泥、化肥、电力、氢</td>
+  <td>中国对欧钢铁/铝出口面临额外碳成本</td>
+</tr>
+<tr>
+  <td><strong>ECOFIN 扩大 CBAM 范围</strong>（6/12）</td>
+  <td><span class="tag-new">重大加码</span></td>
+  <td class="arrow-up">↑ 扩围</td>
+  <td>纳入<strong>下游制成品</strong>：叉车、机械零件、电动机、货车、医疗设备；废钢/废铝防规避</td>
+  <td>中国机械/机电出口欧盟成本显著上升</td>
+</tr>
+<tr>
+  <td>CBAM 范围比欧委会原提案扩大一倍</td>
+  <td>里程碑</td>
+  <td class="arrow-up">↑ 超预期</td>
+  <td>年度复审强制扩围；收紧"资源洗白"</td>
+  <td>出口商需建立完整碳足迹追溯</td>
+</tr>
+<tr class="mkt-row"><td colspan="5">📈 本周映射：欧洲碳价(EUA)周涨 3.2% 至 €82/t；中国铝业 -0.8%（CBAM扩围情绪压制）</td></tr>
+</tbody></table></div>
+
+<!-- ── 芯片管制 ── -->
+<div class="subsection-title">🔒 芯片出口管制 / 实体清单</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:180px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:200px">要点</th><th style="min-width:160px">对华溢出</th></tr></thead>
+<tbody>
+<tr>
+  <td>美对华芯片管制第三轮</td>
+  <td>持续收紧</td>
+  <td class="arrow-flat">→ 维持</td>
+  <td>此前已限制 140 家中国科技公司；豁免部分盟友设备商（ASML/东京电子部分品类）</td>
+  <td>AI/超算芯片获取持续受限</td>
+</tr>
+<tr>
+  <td>中芯国际/长鑫存储等 15 家入列</td>
+  <td><span class="tag-new">加码</span></td>
+  <td class="arrow-up">↑ 加码</td>
+  <td>存储 + Foundry 龙头被列入；管制的"选择性脱钩"特征明显</td>
+  <td>国产替代紧迫性上升</td>
+</tr>
+<tr>
+  <td>日本/荷兰协同管制</td>
+  <td>持续</td>
+  <td class="arrow-flat">→ 维持</td>
+  <td>日本限制 23 种设备；荷兰限制先进 DUV；豁免机制使管制不均衡</td>
+  <td>设备进口渠道全面收窄</td>
+</tr>
+</tbody></table></div>
+
+<!-- ── EV 关税 ── -->
+<div class="subsection-title">🚗 全球电动车关税</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:180px">政策</th><th style="min-width:60px">类型</th><th style="min-width:55px">vs上周</th><th style="min-width:200px">要点</th><th style="min-width:160px">对华溢出</th></tr></thead>
+<tbody>
+<tr>
+  <td>欧盟对华 BEV 反补贴关税</td>
+  <td>执行中(5年)</td>
+  <td class="arrow-flat">→ 维持</td>
+  <td>BYD 17% · 吉利 18.8% · 上汽 35.3% · Tesla中 7.8%（均+10%基础）</td>
+  <td>中国BEV欧洲市占率从~8%回落</td>
+</tr>
+<tr>
+  <td><strong>中欧"价格承诺"共识</strong></td>
+  <td><span class="tag-new">重大缓和</span></td>
+  <td class="arrow-up">↑ 破冰</td>
+  <td>以最低进口价(MIP)替代关税(1/12)；需可追溯+反规避</td>
+  <td>MIP计算方法—2026年最关键中欧贸易议题</td>
+</tr>
+<tr>
+  <td>中国车企对策</td>
+  <td>市场适应</td>
+  <td class="arrow-flat">→ 演进</td>
+  <td>PHEV 出口激增（不征BEV税）；比亚迪/沃尔沃在欧建厂</td>
+  <td>"以价代税"能否持续取决于MIP谈判</td>
+</tr>
+<tr class="mkt-row"><td colspan="5">📈 本周映射：比亚迪 +3.2%、吉利 +1.7%（MIP预期缓和）；上汽 -0.5%（关税最高，承压最重）</td></tr>
+</tbody></table></div>
+
+<!-- ── 日韩/东南亚 ── -->
+<div class="subsection-title">🏭 日韩 / 东南亚科技投资</div>
+<div class="table-wrap"><table>
+<thead><tr><th style="min-width:180px">项目</th><th style="min-width:60px">状态</th><th style="min-width:55px">vs上周</th><th style="min-width:100px">金额</th><th style="min-width:200px">要点</th></tr></thead>
+<tbody>
+<tr>
+  <td><strong>台积电熊本二厂拟升级 3nm</strong></td>
+  <td>重大升级</td>
+  <td class="arrow-up">↑ 突破</td>
+  <td>—</td>
+  <td>若成行将是日本首次量产 3nm；避开美国劳动力瓶颈</td>
+</tr>
+<tr>
+  <td>台积电熊本一厂</td>
+  <td>量产</td>
+  <td class="arrow-flat">→ 推进</td>
+  <td>$86 亿+</td>
+  <td>22/28nm+12/16nm；月产5.5万片；2026Q4满产</td>
+</tr>
+<tr>
+  <td>台积电全球 CapEx</td>
+  <td>扩张</td>
+  <td class="arrow-up">↑ 加速</td>
+  <td>年 >$300 亿</td>
+  <td>亚利桑那+熊本+德累斯顿(2027)三线并进</td>
+</tr>
+<tr>
+  <td>SK海力士 HBM</td>
+  <td>扩张</td>
+  <td class="arrow-up">↑ 加速</td>
+  <td>—</td>
+  <td>HBM3E 供 NVIDIA；2026 HBM4 研发；龙仁集群推进</td>
+</tr>
+<tr>
+  <td>马来西亚槟城/居林封测</td>
+  <td>扩张</td>
+  <td class="arrow-up">↑ 扩张</td>
+  <td>—</td>
+  <td>英特尔、英飞凌扩产—中美脱钩最大受益方之一</td>
+</tr>
+</tbody></table></div>
+
+<!-- ═══════════════ 专家拆解 ═══════════════ -->
+<div class="section-title">🧠 专家拆解：本周政策背后的逻辑</div>
+
+<div class="insight">
+  <h3>1. CBAM 扩大化——碳关税从「原材料的墙」变成「制成的网」</h3>
+  <p><span class="q">为什么现在出？</span> 首批六大基础材料（钢/铝/水泥/化肥/电/氢）覆盖后，欧盟发现出口商正在"下游套利"——将高碳原料加工成制成品再出口，绕过碳关税。6月12日 ECOFIN 的扩围就是封堵这个漏洞。新范围可能从~200个海关编码扩大到<strong>600-800个</strong>。</p>
+  <p><span class="q">与中国政策联动？</span> 中国正补贴 1 级能效家电（15%），推动家电制造商使用低碳钢铝。如果中国企业能建立从原料到成品的碳足迹追溯体系，家电/机械出口欧盟可能获得碳成本优势——<strong>碳竞争力正在成为新贸易壁垒</strong>。</p>
+  <div class="ref">
+    <strong>历史参照</strong>：EU-ETS 2005年启动后用了15年覆盖当前范围。CBAM 正在以5-10倍加速度复现这条路径。区别在于，ETS只约束欧盟内部生产者，CBAM约束的是<strong>所有进入欧盟市场的外国生产者</strong>——这是碳主权的延伸。
+  </div>
+  <div class="counter">
+    <strong>反对观点</strong>：印度、巴西已公开批评 CBAM 是"绿色保护主义"，可能在 WTO 提起诉讼。若 WTO 裁定 CBAM 违反非歧视原则，欧盟将被迫修改或补偿受影响出口国。
+  </div>
+  <p><span class="q">演化方向？</span> 9月欧洲议会将给更激进立场；2026年底三方谈判定最终形态。大概率从2028年起绝大多数金属密集型制成品被纳入。中国企业窗口期约12-18个月。</p>
+</div>
+
+<div class="insight">
+  <h3>2. 中欧 EV「以价代税」——从关税对抗到价格管制</h3>
+  <p><span class="q">为什么重要？</span> 1月12日的中欧"价格承诺"共识允许中国车企以最低进口价（MIP）替代关税。这本质上是双方各退一步：中国不低价倾销，欧盟不征关税。但 MIP 的<strong>计算方法</strong>才是真正的博弈点。</p>
+  <ul style="margin:8px 0 8px 20px; color:#334155;">
+    <li><strong>CIF-plus方式</strong>：MIP = 调查期间出口价 × (1+关税率)。影响相对温和——车企提价幅度等于原来要交的关税。</li>
+    <li><strong>Benchmarking方式</strong>：MIP 对标欧洲同类车型售价。如果对标高端车，中国性价比车型将被挤出市场。</li>
+  </ul>
+  <div class="ref">
+    <strong>历史参照——日美汽车 VER（1981-1994）</strong>：日本接受"自愿出口限制"后，出口量被限制，但倒逼日本车企从低价车升级到<b>雷克萨斯、讴歌</b>高端品牌，单车利润反而提升。MIP如果设定得当，可能倒逼中国EV品牌向上走——<b>从"卖得多"变成"卖得贵"</b>。但如果MIP定得太高，则可能变成另一种形式的关税——只是换了个名字。
+  </div>
+  <p><span class="q">后续？</span> MIP 谈判结果将在 2026 年下半年逐步明朗。直接决定 BYD、吉利、上汽在欧洲未来五年的定价权。间接影响：锂电、动力电池回收、充电桩出口的利润空间。</p>
+</div>
+
+<div class="insight">
+  <h3>3. 中国专项债"进度偏慢"——不是缺钱，是缺项目</h3>
+  <p><span class="q">为什么偏慢？</span> 截至6月下旬，新增专项债发行进度约42%，比近五年同期均值49.6%慢了7-12个百分点。但净融资绝对规模仍是2021年以来较高水平。原因不是缺额度——是<strong>项目审批趋严</strong>（财政部正在专项检查）+ 地方等待"十五五"专项规划出台导致<strong>新项目储备不足</strong> + 超长国债排期挤压。</p>
+  <div class="ref">
+    <strong>历史参照——2015年专项债置换</strong>：2015年首次大规模专项债置换时也出现过类似"前慢后快"——上半年进度~35%，下半年集中发力，全年完成率98%。6月作为二季度冲刺期，大概率出现<b>月末"赶进度"的供给高峰</b>，预计6月净融资5,100-5,700亿元。
+  </div>
+  <p><span class="q">信号含义？</span> 专项债偏慢不是财政收缩信号——是<strong>质量门槛提高了</strong>。财政部新设债务管理司、扩大自审自发试点、收紧项目审核——这是在"提质"和"放量"之间找平衡。叠加城市更新纳入专项债支持范围，下半年基建投资增速有望从5月的放缓中修复。</p>
+</div>
+
+<div class="insight">
+  <h3>4. 美国 CHIPS 进入"量产+股权"双模时代——但7万人的缺口是死穴</h3>
+  <p><span class="q">核心变化？</span> 2026年 CHIPS Act 已从"撒钱建厂"进入<b>实际量产+政府入股</b>双模阶段。Intel 18A量产、TSMC良率92%、三星2nm GAA即将投产——美国先进逻辑从0%→~15%。但美国政府持有Intel~10%股权是史无前例的——这不是补贴，是<b>国有化</b>。正在与TSMC/三星探讨类似安排。</p>
+  <div class="counter">
+    <strong>最大的风险——劳动力</strong>：CHIPS项目到2030年需要~11.5万技术人员，美国社区大学每年仅培养~4,000-5,000合格工程师。供需缺口~7万人。台积电亚利桑那厂被迫从台湾调派工程师（引发劳资争议），Intel从印度/菲律宾招聘（签证限制）。<b>半导体人才正在成为比光刻机更稀缺的战略资源</b>。
+  </div>
+  <div class="ref">
+    <strong>历史参照——1970年代美国制造业外迁</strong>：1970-1980年美国制造业就业从19.5M降至18.5M，不是因为工厂少了——是因为没人愿意干了。CHIPS Act面临同样的结构性问题：<b>你能建工厂，但你不能强迫人去工厂上班</b>。台积电熊本3nm升级正是这个背景下的产物——去日本，因为日本有现成的半导体工程师梯队。
+  </div>
+  <p><span class="q">对中国半导体的镜像启示？</span> 中国半导体人才缺口估超20万。大基金三期3000亿元砸下去，如果不配套人才政策，会遇到同样的"有设备没人操作"困境。</p>
+</div>
+
+<!-- ═══════════════ 下周关注 ═══════════════ -->
+<div class="section-title">🔮 下周关注（6月23日–29日）</div>
+<div class="next-week">
+  <div class="nw-card hot">
+    <div class="date">6/25 周四 20:30 🇺🇸</div>
+    <h4>美国 Q1 GDP 终值 + 5月核心 PCE</h4>
+    <p>本周最重要数据。核心PCE若偏热将强化美联储鹰派立场，利率期货定价将剧烈重估。彭博一致预期核心PCE同比+2.6%。</p>
+  </div>
+  <div class="nw-card hot">
+    <div class="date">6/25 周四 🇺🇸</div>
+    <h4>美联储公布年度银行压力测试</h4>
+    <p>34家大银行接受检验。若结果显示资本充足率不足，可能触发银行股抛售和信贷收紧预期。</p>
+  </div>
+  <div class="nw-card hot">
+    <div class="date">6/25 周四 🇺🇸</div>
+    <h4>英伟达年度股东大会 + 美光 Q3 财报</h4>
+    <p>AI龙头战略指引。关注Blackwell出货节奏、HBM供应瓶颈、中国区收入占比变化。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/23 周二 🇨🇳</div>
+    <h4>第十七届夏季达沃斯论坛（大连，至25日）</h4>
+    <p>全球政商领袖齐聚。潜在主题：AI治理、气候变化、全球供应链重塑。关注总理讲话。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/24 周三 🇨🇳</div>
+    <h4>2026 上海 MWC 世界移动通信大会</h4>
+    <p>聚焦 AI+5G/6G、数字互联。华为/中兴/中国移动将发布新品。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/26 周五 🇺🇸</div>
+    <h4>FOMC 三位票委密集讲话</h4>
+    <p>纽约联储威廉姆斯（三把手）+卡什卡利（鹰派）+古尔斯比（中性偏鹰）。三人同日发声，利率预期波动加剧。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/22 周一 🇨🇳</div>
+    <h4>中国 6月 LPR 公布</h4>
+    <p>市场预期维持不变（1Y 3.1%、5Y 3.6%）。若意外下调则房地产板块短期反弹。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/27 周六 🇨🇳</div>
+    <h4>中国 1-5月工业利润</h4>
+    <p>前值+0.8%。若继续改善将验证制造业复苏。上下游利润分化是否收窄是关键。</p>
+  </div>
+  <div class="nw-card">
+    <div class="date">6/23 周二 🇪🇺</div>
+    <h4>欧元区/德国/法国 6月 PMI 初值</h4>
+    <p>制造业PMI能否守住荣枯线。德国IFO同日发布，验证欧洲经济韧性。</p>
+  </div>
+</div>
+
+<!-- ═══════════════ 产业方向 ═══════════════ -->
+<div class="section-title">🎯 本周值得关注的产业方向</div>
+<div class="dirs">
+  <div class="dir-card">
+    <div class="num">1</div>
+    <h4>车用芯片国产替代加速</h4>
+    <p>工信部明确"加快补齐汽车芯片短板" + 芯联集成 200 亿车规晶圆厂。国内车规 MCU、IGBT、SiC 功率器件供应商可能迎来新一轮订单潮。<strong>关注标的</strong>：车规芯片 Fabless 和 IDM、SiC 衬底/外延厂商。</p>
+  </div>
+  <div class="dir-card">
+    <div class="num">2</div>
+    <h4>CBAM 扩围：碳成本冲击中国机械出口</h4>
+    <p>CBAM 从基础材料扩大到叉车、电动机、医疗设备等下游制成品。所有对欧出口金属密集型产品的中国企业需尽快建立产品级碳足迹核算能力。<strong>最大受益方</strong>：低碳铝/钢供应商、碳足迹 SaaS 服务商。</p>
+  </div>
+  <div class="dir-card">
+    <div class="num">3</div>
+    <h4>专项债"赶进度"窗口—基建板块催化</h4>
+    <p>6月下旬专项债有望集中发行（月内净融资预计5,100-5,700亿），叠加城市更新纳入支持范围，水泥/管材/防水/电梯等建材品类可能迎来短期催化。</p>
+  </div>
+</div>
+
+<!-- ═══════════════ 来源 ═══════════════ -->
+<div class="sources">
+  <strong>📚 信息来源（按可信度分级）</strong>
+  <div class="tier">
+    <span class="tier-label t1">🟢 一手信源（官方公告）</span>
+    财政部 (gs.mof.gov.cn) · 国家发改委 (ndrc.gov.cn) · 工信部 · 商务部 · 国务院政策例行吹风会 · 欧盟理事会 (consilium.europa.eu) · European Commission · US Commerce Department
+  </div>
+  <div class="tier">
+    <span class="tier-label t2">🔵 二手信源（权威媒体）</span>
+    新华社 · 21世纪经济报道 · 经济参考报 · Yicai · 中国证券报 · Brussels Times · Business Times · ESG Today · Carbon Herald
+  </div>
+  <div class="tier">
+    <span class="tier-label t3">⚪ 三方分析（券商/智库）</span>
+    华创证券 · 兴业证券 · 天风证券 · WisdomTree · Wedbush Securities · Georgetown CSET · ETLA (芬兰智库)
+  </div>
+  <p style="margin-top:12px;"><em>数据截至 2026年6月22日。市场数据为估算，仅供参考，不构成投资建议。</em></p>
+</div>
+
+</body>
+</html>"""
+
+with open(r'D:\news\周报-政策追踪-2026-06-22.html', 'w', encoding='utf-8') as f:
+    f.write(html)
+
+sz = os.path.getsize(r'D:\news\周报-政策追踪-2026-06-22.html')
+print(f'Done: {sz} bytes ({sz//1024} KB)')
+print('Saved to: D:\\news\\周报-政策追踪-2026-06-22.html')
